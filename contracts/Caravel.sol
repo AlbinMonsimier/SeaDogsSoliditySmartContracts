@@ -36,21 +36,15 @@ struct Position {
 }
 
   constructor(
-    string memory _name,
-    string memory _symbol,
+    // string memory _name,
+    // string memory _symbol,
     string memory _initBaseURI
-  ) IERC1155(_name, _symbol) {
+  ) ERC1155(_initBaseURI) {
     setBaseURI(_initBaseURI);
-    mint(1000);
+    mint(1);
   }
 
- event boatMoved(address _owner, address _boatId, Position _position);
-
-
-  // internal
-  function _baseURI() internal view virtual override returns (string memory) {
-    return baseURI;
-  }
+ event boatMoved(address _owner, uint256 _boatId, Position _position);
 
   // public
   function mint(uint32 _mintAmount) public payable onlyOwner {
@@ -61,53 +55,35 @@ struct Position {
       require(msg.value >= cost * _mintAmount);
     }
 
-    for (uint256 i=0; i < 1000; i++) {
+    for (uint256 i=0; i < 1; i++) {
         _tokenDetatils[i] = Boat(Life(1,2),Position(1,1),1,1,1);
     }
-    _mint(msg.sender, 1, _mintAmount);
+    _mint(msg.sender, 1, _mintAmount, "test");
   }
 
-  function moveBoat(uint32 boatId, uint16 x , uint16 y ) public {
-      uint256 tokenBalance = balanceOf(msg.sender, boatId);
-      require(tokenBalance == 1, "you dont own this token");
+  function moveBoat(uint32 boatId, uint8 x , uint8 y ) public {
+      bool ownTheBoat = _ownerOf(boatId);
+      require(ownTheBoat, "you dont own this token");
     _tokenDetatils[boatId].Position = Position(x,y);
     emit boatMoved(msg.sender, boatId, Position(x,y));
   }
 
-  function walletOfOwner (address _owner)
-    public
-    view
-    returns (uint256[] memory)
-  {
-    uint256 ownerTokenCount = balanceOf(_owner);
-    uint256[] memory tokenIds = new uint256[](ownerTokenCount);
-    for (uint256 i; i < ownerTokenCount; i++) {
-      tokenIds[i] = tokenOfOwnerByIndex(_owner, i);
-    }
-    return tokenIds;
-  }
+  // function walletOfOwner (address _owner)
+  //   public
+  //   view
+  //   returns (uint256[] memory)
+  // {
+  //   uint256 ownerTokenCount = balanceOf(_owner);
+  //   uint256[] memory tokenIds = new uint256[](ownerTokenCount);
+  //   for (uint256 i; i < ownerTokenCount; i++) {
+  //     tokenIds[i] = tokenOfOwnerByIndex(_owner, i);
+  //   }
+  //   return tokenIds;
+  // }
 
-  function tokenURI(uint256 tokenId)
-    public
-    view
-    virtual
-    override
-    returns (string memory)
-  {
-    require(
-      _exists(tokenId),
-      "ERC721Metadata: URI query for nonexistent token"
-    );
-    
-    if(revealed == false) {
-        return notRevealedUri;
-    }
-
-    string memory currentBaseURI = _baseURI();
-    return bytes(currentBaseURI).length > 0
-        ? string(abi.encodePacked(currentBaseURI, tokenId.toString(), baseExtension))
-        : "";
-  }
+function _ownerOf(uint256 tokenId) internal view returns (bool) {
+    return balanceOf(msg.sender, tokenId) != 0;
+}
 
   function setCost(uint256 _newCost) public onlyOwner {
     cost = _newCost;

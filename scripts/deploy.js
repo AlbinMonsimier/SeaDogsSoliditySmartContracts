@@ -4,7 +4,7 @@ const { ethers } = require("hardhat");
 async function main() {
 
   const Caravel = await ethers.getContractFactory("Caravel");
-  const caravel = await Caravel.deploy("Caravel", "Crv", "https://ipfs.io/ipfs/QmZNPHv7NAuzE7T2z9q27M14iNg9gftBJRvWdaHwg1QXL1/", "none");
+  const caravel = await Caravel.deploy("https://ipfs.io/ipfs/QmZNPHv7NAuzE7T2z9q27M14iNg9gftBJRvWdaHwg1QXL1/");
 
   await caravel.deployed();
   console.log("Success! Contract was deployed to: ", caravel.address);
